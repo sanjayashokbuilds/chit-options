@@ -28,3 +28,28 @@ def test_browser_entry_point_matches_the_calculator():
     assert got["limit"] == pytest.approx(want.limit, abs=1e-7)
     assert got["p_win"] == pytest.approx(want.p_win, abs=1e-7)
     assert got["month"] == 3 and len(got["belief"]) == 12 - 3 + 1
+
+
+def test_browser_game_engine_matches_the_python_model():
+    # The "Play a chit" game re-implements the chit in JavaScript. When every seat
+    # follows the equilibrium, its average winning discount by month must match
+    # the Python model's exact term structure.
+    import shutil
+    import subprocess
+    from pathlib import Path
+
+    from chit import analysis as an
+    from chit.mechanics import ChitParams
+    from chit.members import MemberParams
+
+    if shutil.which("node") is None:
+        pytest.skip("node is not installed")
+    root = Path(__file__).resolve().parents[1]
+    g = json.loads((root / "docs/data/game.json").read_text())
+    out = json.loads(subprocess.run(["node", str(root / "tests/game_engine_check.js"), "6000"],
+                                    capture_output=True, text=True, check=True).stdout)
+    chit = ChitParams(g["members"], g["instalment"], g["commission"], g["cap"])
+    m = MemberParams(r_borrow=g["r_borrow"], r_save=g["r_save"], p_need=g["p_need"])
+    ts = an.term_structure(chit, m, table_from_lists(g["table"]))
+    for t in range(1, g["members"]):
+        assert abs(out["mean"][t] - ts.discount[t]) <= 4 * out["se"][t] + 1e-9, t

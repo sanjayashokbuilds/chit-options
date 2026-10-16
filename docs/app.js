@@ -40,15 +40,15 @@
       const a = -Math.PI / 2 + (2 * Math.PI * i) / n;
       const g = add("g", { class: "seat" });
       const x = cx + R * Math.cos(a), y = cy + R * Math.sin(a);
-      const c = add("circle", { cx: x, cy: y, r: 17 }, g);
+      const c = add("circle", { cx: x, cy: y, r: 18 }, g);
       const t = add("text", { class: "seat-num", x, y }, g);
       t.textContent = i === 0 ? "F" : i + 1;
       ring.seats.push({ c, t, x, y });
     }
-    const ta = add("text", { class: "center-ta", x: cx, y: cy - 44, lang: "ta" });
+    const ta = add("text", { class: "center-a", x: cx, y: cy - 40, lang: "ta" });
     ta.textContent = "சீட்டு";
-    ring.month = add("text", { class: "center-month", x: cx, y: cy + 10 });
-    ring.pot = add("text", { class: "center-pot", x: cx, y: cy + 38 });
+    ring.month = add("text", { class: "center-b", x: cx, y: cy + 14 });
+    ring.pot = add("text", { class: "center-c", x: cx, y: cy + 42 });
 
     const slider = document.getElementById("ring-month");
     slider.max = n;
@@ -64,10 +64,11 @@
     const wonBefore = new Set(ex.months.slice(0, t).map(m => m.winner));
     const needy = new Set(mo.in_need);
     ring.seats.forEach((s, i) => {
-      let fill = css("--panel"), stroke = css("--ink-3"), sw = 2, text = css("--ink-2");
-      if (i === mo.winner) { fill = css("--marigold"); stroke = css("--marigold"); text = "#1e2252"; }
-      else if (wonBefore.has(i)) { fill = css("--won"); stroke = css("--won"); text = css("--ink-2"); }
-      else if (needy.has(i)) { stroke = css("--marigold"); sw = 4; }
+      // the hero sits on the dark "night" band, so it uses fixed night colours
+      let fill = "#20245a", stroke = "#8d92c4", sw = 2, text = "#c9ccf0";
+      if (i === mo.winner) { fill = "#f2a900"; stroke = "#f2a900"; text = "#1b1f4b"; }
+      else if (wonBefore.has(i)) { fill = "#2c3170"; stroke = "#2c3170"; text = "#7f84b8"; }
+      else if (needy.has(i)) { stroke = "#f2a900"; sw = 4; }
       s.c.style.fill = fill; s.c.style.stroke = stroke; s.c.style.strokeWidth = sw;
       s.t.style.fill = text;
     });
@@ -86,13 +87,13 @@
 
   function story(t) {
     const ex = state.example, n = ex.members, mo = ex.months[t];
-    if (t === 0) return `The foreman, who runs the chit, takes the first pot of ${rupees(ex.pot)} with no auction. Every member pays the full ${rupees(ex.instalment)}.`;
-    if (t === n - 1) return `Only seat ${mo.winner + 1} is left, so there is no auction. They take ${rupees(mo.payout)}: the pot less the foreman's commission.`;
+    if (t === 0) return `The organiser (F) takes the first pot of ${rupees(ex.pot)} with no auction. Every member pays the full ${rupees(ex.instalment)}. Gold rings mark members who need cash.`;
+    if (t === n - 1) return `Only seat ${mo.winner + 1} is left, so there is no auction. They take ${rupees(mo.payout)}: the pot less the organiser's commission.`;
     const waiting = mo.waiting.length, needy = mo.in_need.length;
     const needText = needy === 0 ? "none of whom need cash right now" : needy === 1 ? "one of whom needs cash now" : `${needy} of whom need cash now`;
     const shared = mo.discount * ex.pot - mo.commission;
     return `${waiting} members are still waiting, ${needText}. Seat ${mo.winner + 1} wins by giving up ${pct(mo.discount)} of the pot and takes ${rupees(mo.payout)}. ` +
-      `The foreman keeps ${rupees(mo.commission)} and ${rupees(shared)} is shared out, so everyone pays ${rupees(mo.payment)} this month instead of ${rupees(ex.instalment)}.`;
+      `The organiser keeps ${rupees(mo.commission)} and ${rupees(shared)} is shared out, so everyone pays ${rupees(mo.payment)} this month instead of ${rupees(ex.instalment)}.`;
   }
 
   function startPlay() {
@@ -155,10 +156,12 @@
       tipTitle: m => `Month ${m} of ${n}`,
     });
     const peak = s.yield_peak_month + 1;              // our month index t -> calendar month t+1
+    const where = peak / n, lo = 0.25 - 1e-9, hi = 1 / 3 + 1e-9;
+    const verdict = where < lo ? "earlier than practitioners say" : where <= hi ? "where practitioners say" : "later than practitioners say";
     document.getElementById("rates-readout").innerHTML = `
-      <div><dt>Average implied rate</dt><dd>${pct(s.mean_yield)} a year</dd></div>
-      <div><dt>Yield to end peaks</dt><dd>${Math.round((100 * peak) / n)}% of the way in</dd></div>
-      <div><dt>First auction's winning bid</dt><dd>${pct(s.discount[0])} of pot</dd></div>`;
+      <div><dt>Average implied rate</dt><dd>${pct(s.mean_yield)}<small>a year</small></dd></div>
+      <div><dt>Rates peak in</dt><dd>Month ${peak} of ${n}<small>${Math.round(100 * where)}% of the way in, ${verdict}</small></dd></div>
+      <div><dt>First winning bid</dt><dd>${pct(s.discount[0])}<small>of the pot</small></dd></div>`;
   }
 
   function drawCap() {
@@ -263,6 +266,7 @@
     [state.example, state.explore, state.tables] = await Promise.all([
       get("data/example.json"), get("data/explore.json"), get("data/tables.json")]);
     buildRing();
+    if (window.ChitGame) window.ChitGame.init();
     buildExplorer();
     document.getElementById("advice-form").addEventListener("submit", advise);
     let resizeTimer;

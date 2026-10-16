@@ -8,7 +8,7 @@ A seat in a Tamil chit fund is a one-time right to take the pot in any month, at
 
 The model is calibrated to published bid data from a Tamil Nadu chit company. It reproduces the level of chit interest rates and an early-to-mid hump in the implied-rate curve, and it gets the effect of the 1993 bid cap only half right. Both the successes and the failures are reported below.
 
-Built as a 24-hour solo project. Everything is one tested Python package (44 tests); the web app runs the same package in the browser.
+Built as a 24-hour solo project. Everything is one tested Python package (45 tests); the web app runs the same package in the browser.
 
 ---
 
@@ -175,7 +175,7 @@ python scripts/advise.py --members 40 --instalment 250 --history 0.38,0.37,0.37 
 # about 42%, at an expected discount of 36.4%.
 ```
 
-The **web app** (`docs/`, a static site) plays through one simulated chit seat by seat, lets you explore the implied-rate curve across 144 precomputed settings, shows the calibration, and runs the calculator. The calculator executes this repository's Python in the browser with [Pyodide](https://pyodide.org); the equilibrium tables it needs are precomputed by `scripts/build_site.py`, because solving them live in a browser is too slow.
+The **web app** (`docs/`, a static site) lets you **play a chit**: you sit in a 10-member chit against nine rivals who bid the model's equilibrium, cash emergencies arrive at random, and you drop out of or stay in each rising auction. At the end the same chit (same emergencies, same lottery draws) is replayed with the model's rule in your seat, so you can see whether you beat it. The game's chit engine is written in JavaScript and a test checks its average winning bids against the Python model's exact numbers. The app also plays through one simulated chit seat by seat, lets you explore the implied-rate curve across 144 precomputed settings, shows the calibration, and runs the calculator. The calculator executes this repository's Python in the browser with [Pyodide](https://pyodide.org); the equilibrium tables it needs are precomputed by `scripts/build_site.py`, because solving them live in a browser is too slow.
 
 To publish it on **Netlify**: import this repository, leave the build command empty and set the publish directory to `docs` (the included `netlify.toml` does this for you). On **GitHub Pages**: Settings → Pages → Deploy from a branch → `main`, folder `/docs`.
 
@@ -206,12 +206,12 @@ chit/              the package (numpy only)
 scripts/           results, calibration, site build, command-line advice
 results/           figures and JSON outputs
 docs/              the web app (static; netlify.toml publishes it)
-tests/             44 tests
+tests/             45 tests
 ```
 
 ```bash
 pip install -e ".[dev,results]"
-pytest                              # 44 tests, about 20 s
+pytest                              # 45 tests, about 20 s
 python scripts/run_results.py       # stylised results and figures, about 20 s
 python scripts/run_calibration.py   # calibration and the 1993-cap check, a few minutes
 python scripts/build_site.py        # data for the web app, about 15 minutes

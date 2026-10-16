@@ -60,7 +60,7 @@
 
     if (opts.band) {
       const x0 = X(Math.max(opts.band.x0, xMin)), x1 = X(Math.min(opts.band.x1, xMax));
-      el("rect", { class: "band", x: x0, y: m.t, width: Math.max(0, x1 - x0), height: H - m.t - m.b }, svg);
+      el("rect", { class: "range-band", x: x0, y: m.t, width: Math.max(0, x1 - x0), height: H - m.t - m.b }, svg);
       const lab = el("text", { class: "band-label", x: x0 + 6, y: m.t + 14 }, svg);
       lab.textContent = opts.band.label;
     }

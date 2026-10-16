@@ -6,6 +6,7 @@ docs/ is served as-is by GitHub Pages. This script writes:
   docs/data/explore.json    term structures for a grid of settings
   docs/data/example.json    one simulated 20-member chit, month by month
   docs/data/tables.json     equilibrium bidding tables for the calculator
+  docs/data/game.json       the equilibrium the game's rivals follow
   docs/py/chit/*.py         a copy of the package, loaded into Pyodide
 """
 
@@ -93,6 +94,19 @@ def tables():
     return out
 
 
+def game():
+    """The equilibrium the 'Play a chit' game's rivals follow: a short, lively
+    10-member chit (needs more common than the calibrated 4.25% so the game
+    has some drama)."""
+    chit = ChitParams(10, 1000, COMMISSION, 0.40)
+    m = MemberParams(r_borrow=FIT.r_borrow, r_save=FIT.r_save, p_need=0.12)
+    e = eq.solve(chit, m)
+    assert e.converged and abs(e.deviation_gain) < 1e-8
+    return {"members": 10, "instalment": 1000, "commission": COMMISSION, "cap": 0.40,
+            "p_need": m.p_need, "r_borrow": m.r_borrow, "r_save": m.r_save,
+            "table": table_to_lists(e.w)}
+
+
 def main():
     (DOCS / "data").mkdir(parents=True, exist_ok=True)
     py = DOCS / "py" / "chit"
@@ -103,6 +117,7 @@ def main():
         shutil.copy(f, py / f.name)
     (DOCS / "py" / "files.json").write_text(json.dumps(sorted(f.name for f in py.glob("*.py"))))
 
+    (DOCS / "data" / "game.json").write_text(json.dumps(game()))
     (DOCS / "data" / "example.json").write_text(json.dumps(example()))
     (DOCS / "data" / "tables.json").write_text(json.dumps(tables()))
     (DOCS / "data" / "explore.json").write_text(json.dumps(explore()))
