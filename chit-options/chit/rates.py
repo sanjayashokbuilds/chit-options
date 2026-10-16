@@ -42,9 +42,9 @@ def irr_roots(flows, lo: float = -0.5, hi: float = 0.5, grid: int = 2001) -> lis
     return roots
 
 
-def monthly_irr(flows) -> float:
-    """The unique monthly IRR in a plausible range; raises if not unique."""
-    roots = irr_roots(flows)
+def monthly_irr(flows, lo: float = -0.5, hi: float = 0.5) -> float:
+    """The unique monthly IRR in [lo, hi]; raises if not unique."""
+    roots = irr_roots(flows, lo, hi)
     if len(roots) != 1:
         raise ValueError(f"expected one IRR, found {len(roots)}: {roots}")
     return roots[0]

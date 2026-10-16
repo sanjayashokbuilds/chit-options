@@ -44,11 +44,28 @@ def settle_month(params: ChitParams, discount: float) -> tuple[float, float, flo
     return pot * (1 - discount), params.instalment - dividend_each, commission
 
 
+def monthly_settlements(params: ChitParams, discounts):
+    """settle_month for every month of the chit.
+
+    discounts[t] = winning discount in month t (ignored in the foreman's month).
+    Returns three arrays of length N: payouts, payments (per member), commissions.
+    """
+    n = params.n_members
+    if len(discounts) != n:
+        raise ValueError(f"need {n} discounts, got {len(discounts)}")
+    payouts, payments, commissions = np.zeros(n), np.zeros(n), np.zeros(n)
+    for t in range(n):
+        if t == 0 and params.foreman_first:
+            payouts[t], payments[t], commissions[t] = params.pot, params.instalment, 0.0
+        else:
+            payouts[t], payments[t], commissions[t] = settle_month(params, discounts[t])
+    return payouts, payments, commissions
+
+
 def cash_flow_matrix(params: ChitParams, winners, discounts):
     """Every member's cash flow in every month, for one complete auction path.
 
-    winners[t]   = index of the member who takes the pot in month t
-    discounts[t] = winning discount in month t (ignored in the foreman's month)
+    winners[t] = index of the member who takes the pot in month t.
 
     Returns (flows, commissions):
       flows[i, t]    = member i's net cash in month t (+ received, - paid)
@@ -61,13 +78,8 @@ def cash_flow_matrix(params: ChitParams, winners, discounts):
     if params.foreman_first and winners[0] != 0:
         raise ValueError("foreman (member 0) must win month 0")
 
-    flows = np.zeros((n, n))
-    commissions = np.zeros(n)
+    payouts, payments, commissions = monthly_settlements(params, discounts)
+    flows = np.tile(-payments, (n, 1))      # every member pays the same each month...
     for t in range(n):
-        if t == 0 and params.foreman_first:
-            payout, payment, commissions[t] = params.pot, params.instalment, 0.0
-        else:
-            payout, payment, commissions[t] = settle_month(params, discounts[t])
-        flows[:, t] -= payment             # everyone pays in
-        flows[winners[t], t] += payout     # the winner takes the pot
+        flows[winners[t], t] += payouts[t]  # ...and the month's winner also gets the pot
     return flows, commissions
