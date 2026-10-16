@@ -16,7 +16,7 @@ from dataclasses import dataclass
 
 import numpy as np
 
-from .mechanics import ChitParams
+from .mechanics import ChitParams, cash_flow_matrix
 from .members import MemberParams, update_needs
 
 
@@ -46,7 +46,11 @@ class ChitPath:
     needs: np.ndarray       # needs[i, t] = member i was in need at month t's auction
 
 
-def simulate_chit(rng, chit: ChitParams, members: MemberParams, strategy, fmt="english"):
+def simulate_chit(rng, chit: ChitParams, members: MemberParams, strategy, fmt="english",
+                  focal=None):
+    """focal = (member index, decide) lets one member follow their own rule instead:
+    decide(t, own_need, k) -> True to bid up to the cap, False to sit the auction
+    out, where k = how many of the OTHER waiting members are in need."""
     n = chit.n_members
     won = np.zeros(n, dtype=bool)
     in_need = np.zeros(n, dtype=bool)
@@ -61,6 +65,14 @@ def simulate_chit(rng, chit: ChitParams, members: MemberParams, strategy, fmt="e
         else:
             bidders = np.flatnonzero(~won)
             willing = [strategy(t, in_need[i]) for i in bidders]
+            if focal is not None and not won[focal[0]] and len(bidders) > 1:
+                i = focal[0]
+                others = bidders[bidders != i]
+                if focal[1](t, int(in_need[i]), int(in_need[others].sum())):
+                    willing = [chit.bid_cap if b == i else w for b, w in zip(bidders, willing)]
+                else:                                   # sit out: drop from the auction
+                    willing = [w for b, w in zip(bidders, willing) if b != i]
+                    bidders = others
             winner, discount = run_auction(rng, bidders, willing, chit, fmt)
         winners[t], discounts[t] = winner, discount
         won[winner] = True
@@ -68,7 +80,20 @@ def simulate_chit(rng, chit: ChitParams, members: MemberParams, strategy, fmt="e
     return ChitPath(winners, discounts, needs)
 
 
-def simulate_many(chit, members, strategy, n_sims: int, seed: int = 0, fmt="english"):
+def simulate_many(chit, members, strategy, n_sims: int, seed: int = 0, fmt="english",
+                  focal=None):
     """Run n_sims independent groups. Returns a list of ChitPath."""
     rng = np.random.default_rng(seed)
-    return [simulate_chit(rng, chit, members, strategy, fmt) for _ in range(n_sims)]
+    return [simulate_chit(rng, chit, members, strategy, fmt, focal) for _ in range(n_sims)]
+
+
+def member_pv(chit: ChitParams, members: MemberParams, path: ChitPath, i: int) -> float:
+    """Present value at month 0 of member i's cash flows, as a fraction of the pot,
+    discounting each month at r_borrow while in need and r_save otherwise."""
+    flows, _ = cash_flow_matrix(chit, path.winners, path.discounts)
+    win_month = int(np.flatnonzero(path.winners == i)[0])
+    months = np.arange(chit.n_members)
+    needy_after = path.needs[i] & (months < win_month)     # need status after each auction
+    rates = np.where(needy_after, members.r_borrow, members.r_save)
+    discount = np.concatenate([[1.0], np.cumprod(1 / (1 + rates[:-1]))])
+    return float(np.sum(flows[i] * discount) / chit.pot)
