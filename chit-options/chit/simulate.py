@@ -64,7 +64,11 @@ def simulate_chit(rng, chit: ChitParams, members: MemberParams, strategy, fmt="e
             winner, discount = 0, 0.0                   # foreman's month, no auction
         else:
             bidders = np.flatnonzero(~won)
-            willing = [strategy(t, in_need[i]) for i in bidders]
+            if getattr(strategy, "uses_k", False):      # strategy also sees k
+                needy = int(in_need[bidders].sum())
+                willing = [strategy(t, in_need[i], needy - int(in_need[i])) for i in bidders]
+            else:
+                willing = [strategy(t, in_need[i]) for i in bidders]
             if focal is not None and not won[focal[0]] and len(bidders) > 1:
                 i = focal[0]
                 others = bidders[bidders != i]
