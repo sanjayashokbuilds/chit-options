@@ -1,0 +1,369 @@
+{
+  "base": {
+    "chit": {
+      "n_members": 20,
+      "instalment": 100,
+      "commission": 0.05,
+      "bid_cap": 0.4,
+      "foreman_first": true
+    },
+    "members": {
+      "r_borrow": 0.02,
+      "r_save": 0.005,
+      "p_need": 0.1
+    },
+    "scenario": {
+      "label": "base",
+      "seat_value": -0.064086,
+      "mean_forward": 0.117303,
+      "mean_yield": 0.120653,
+      "first_discount": 0.194449,
+      "forward_peak": 0.7,
+      "yield_peak": 0.5,
+      "converged": true,
+      "deviation_gain": -0.0
+    },
+    "term_structure": {
+      "month": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19
+      ],
+      "discount": [
+        0.194449,
+        0.191073,
+        0.18686,
+        0.181852,
+        0.17608,
+        0.16956,
+        0.1623,
+        0.154308,
+        0.145599,
+        0.136198,
+        0.126156,
+        0.115558,
+        0.104554,
+        0.093381,
+        0.082397,
+        0.072091,
+        0.063031,
+        0.055666
+      ],
+      "forward_annual": [
+        0.051836,
+        0.064676,
+        0.076779,
+        0.088333,
+        0.099522,
+        0.110425,
+        0.121026,
+        0.131216,
+        0.140778,
+        0.149339,
+        0.156304,
+        0.160761,
+        0.161394,
+        0.156514,
+        0.144431,
+        0.12451,
+        0.099019,
+        0.074593
+      ],
+      "yield_annual": [
+        0.116295,
+        0.120245,
+        0.123851,
+        0.1271,
+        0.129961,
+        0.132381,
+        0.134277,
+        0.135542,
+        0.136033,
+        0.135572,
+        0.133934,
+        0.130854,
+        0.126033,
+        0.119188,
+        0.11015,
+        0.099064,
+        0.086675,
+        0.074593
+      ],
+      "needy_share": [
+        0.19,
+        0.231412,
+        0.268372,
+        0.30107,
+        0.329678,
+        0.354288,
+        0.374906,
+        0.391446,
+        0.403705,
+        0.411346,
+        0.413862,
+        0.410545,
+        0.400457,
+        0.382457,
+        0.355334,
+        0.318204,
+        0.271358,
+        0.217682
+      ]
+    }
+  },
+  "p_need_sweep": [
+    {
+      "label": "p_need=0.02",
+      "seat_value": -0.05215,
+      "mean_forward": 0.062396,
+      "mean_yield": 0.062213,
+      "first_discount": 0.132433,
+      "forward_peak": 0.45,
+      "yield_peak": 0.25,
+      "converged": true,
+      "deviation_gain": -0.0
+    },
+    {
+      "label": "p_need=0.05",
+      "seat_value": -0.053831,
+      "mean_forward": 0.071615,
+      "mean_yield": 0.069294,
+      "first_discount": 0.143326,
+      "forward_peak": 0.45,
+      "yield_peak": 0.3,
+      "converged": true,
+      "deviation_gain": -0.0
+    },
+    {
+      "label": "p_need=0.1",
+      "seat_value": -0.064086,
+      "mean_forward": 0.117303,
+      "mean_yield": 0.120653,
+      "first_discount": 0.194449,
+      "forward_peak": 0.7,
+      "yield_peak": 0.5,
+      "converged": true,
+      "deviation_gain": -0.0
+    },
+    {
+      "label": "p_need=0.2",
+      "seat_value": -0.081261,
+      "mean_forward": 0.153339,
+      "mean_yield": 0.194372,
+      "first_discount": 0.231647,
+      "forward_peak": 0.9,
+      "yield_peak": 0.85,
+      "converged": true,
+      "deviation_gain": -0.0
+    },
+    {
+      "label": "p_need=0.4",
+      "seat_value": -0.087781,
+      "mean_forward": 0.156643,
+      "mean_yield": 0.205297,
+      "first_discount": 0.234771,
+      "forward_peak": 0.95,
+      "yield_peak": 0.95,
+      "converged": true,
+      "deviation_gain": 0.0
+    }
+  ],
+  "sensitivities": {
+    "r_borrow": [
+      {
+        "label": "r_borrow=0.01",
+        "seat_value": -0.056388,
+        "mean_forward": 0.080517,
+        "mean_yield": 0.081367,
+        "first_discount": 0.154047,
+        "forward_peak": 0.7,
+        "yield_peak": 0.5,
+        "converged": true,
+        "deviation_gain": -0.0
+      },
+      {
+        "label": "r_borrow=0.02",
+        "seat_value": -0.064086,
+        "mean_forward": 0.117303,
+        "mean_yield": 0.120653,
+        "first_discount": 0.194449,
+        "forward_peak": 0.7,
+        "yield_peak": 0.5,
+        "converged": true,
+        "deviation_gain": -0.0
+      },
+      {
+        "label": "r_borrow=0.03",
+        "seat_value": -0.070541,
+        "mean_forward": 0.152921,
+        "mean_yield": 0.159758,
+        "first_discount": 0.229547,
+        "forward_peak": 0.7,
+        "yield_peak": 0.5,
+        "converged": true,
+        "deviation_gain": -0.0
+      },
+      {
+        "label": "r_borrow=0.04",
+        "seat_value": -0.075948,
+        "mean_forward": 0.187425,
+        "mean_yield": 0.198625,
+        "first_discount": 0.260128,
+        "forward_peak": 0.7,
+        "yield_peak": 0.5,
+        "converged": true,
+        "deviation_gain": -0.0
+      }
+    ],
+    "r_save": [
+      {
+        "label": "r_save=0.0",
+        "seat_value": -0.067109,
+        "mean_forward": 0.0698,
+        "mean_yield": 0.074418,
+        "first_discount": 0.13923,
+        "forward_peak": 0.7,
+        "yield_peak": 0.5,
+        "converged": true,
+        "deviation_gain": -0.0
+      },
+      {
+        "label": "r_save=0.005",
+        "seat_value": -0.064086,
+        "mean_forward": 0.117303,
+        "mean_yield": 0.120653,
+        "first_discount": 0.194449,
+        "forward_peak": 0.7,
+        "yield_peak": 0.5,
+        "converged": true,
+        "deviation_gain": -0.0
+      },
+      {
+        "label": "r_save=0.01",
+        "seat_value": -0.061342,
+        "mean_forward": 0.166216,
+        "mean_yield": 0.168352,
+        "first_discount": 0.245199,
+        "forward_peak": 0.7,
+        "yield_peak": 0.5,
+        "converged": true,
+        "deviation_gain": -0.0
+      }
+    ],
+    "commission": [
+      {
+        "label": "commission=0.03",
+        "seat_value": -0.045794,
+        "mean_forward": 0.119074,
+        "mean_yield": 0.121529,
+        "first_discount": 0.179435,
+        "forward_peak": 0.7,
+        "yield_peak": 0.5,
+        "converged": true,
+        "deviation_gain": -0.0
+      },
+      {
+        "label": "commission=0.05",
+        "seat_value": -0.064086,
+        "mean_forward": 0.117303,
+        "mean_yield": 0.120653,
+        "first_discount": 0.194449,
+        "forward_peak": 0.7,
+        "yield_peak": 0.5,
+        "converged": true,
+        "deviation_gain": -0.0
+      },
+      {
+        "label": "commission=0.07",
+        "seat_value": -0.082379,
+        "mean_forward": 0.115465,
+        "mean_yield": 0.119741,
+        "first_discount": 0.209462,
+        "forward_peak": 0.7,
+        "yield_peak": 0.5,
+        "converged": true,
+        "deviation_gain": -0.0
+      }
+    ]
+  },
+  "greeks": {
+    "p_need": -0.252028,
+    "r_borrow": -0.704176,
+    "r_save": 0.57595,
+    "commission": -0.914632
+  },
+  "bid_cap": {
+    "members": {
+      "r_borrow": 0.04,
+      "r_save": 0.005,
+      "p_need": 0.2
+    },
+    "runs": [
+      {
+        "label": "cap=0.4",
+        "seat_value": -0.10778,
+        "mean_forward": 0.274895,
+        "mean_yield": 0.386358,
+        "first_discount": 0.332847,
+        "forward_peak": 0.9,
+        "yield_peak": 0.85,
+        "converged": true,
+        "deviation_gain": -0.0
+      },
+      {
+        "label": "cap=0.35",
+        "seat_value": -0.10778,
+        "mean_forward": 0.274895,
+        "mean_yield": 0.386358,
+        "first_discount": 0.332847,
+        "forward_peak": 0.9,
+        "yield_peak": 0.85,
+        "converged": true,
+        "deviation_gain": -0.0
+      },
+      {
+        "label": "cap=0.3",
+        "seat_value": -0.108815,
+        "mean_forward": 0.240971,
+        "mean_yield": 0.378018,
+        "first_discount": 0.3,
+        "forward_peak": 0.9,
+        "yield_peak": 0.85,
+        "converged": true,
+        "deviation_gain": -0.0
+      },
+      {
+        "label": "cap=0.25",
+        "seat_value": -0.110505,
+        "mean_forward": 0.18964,
+        "mean_yield": 0.345119,
+        "first_discount": 0.25,
+        "forward_peak": 0.9,
+        "yield_peak": 0.85,
+        "converged": true,
+        "deviation_gain": -0.0
+      }
+    ],
+    "p_cap_month1": [
+      0.0,
+      0.0,
+      1.0,
+      1.0
+    ]
+  }
+}
