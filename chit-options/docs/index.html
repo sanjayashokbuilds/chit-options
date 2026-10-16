@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chit seats as options</title>
+<meta name="description" content="Pricing a seat in a Tamil chit fund with American-option methods: dynamic programming, Longstaff–Schwartz and equilibrium bidding.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anek+Tamil:wdth,wght@75..125,300..700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="site">
+  <a class="brand" href="#top">Chit seats as options</a>
+  <nav aria-label="Sections">
+    <a href="#rates">Rates</a>
+    <a href="#data">Real data</a>
+    <a href="#advice">Bidding advice</a>
+    <a href="#method">Method</a>
+    <a href="https://github.com/sanjayashokbuilds/chit-options">Code</a>
+  </nav>
+</header>
+
+<main id="top">
+
+<section class="hero">
+  <div class="hero-text">
+    <h1>What is a seat in a chit fund worth?</h1>
+    <p class="deck">In a Tamil chit, or <span lang="ta">சீட்டு</span>, every member pays in each month and one member takes the whole pot. They bid for it: whoever will give up the most of the pot wins, and what they give up is shared among everyone.</p>
+    <p class="deck">Taking the pot early is borrowing; taking it late is saving. Each seat is a one-time right to choose when, which is exactly what an American option is. This project prices that right.</p>
+    <p class="hero-note">Play through one simulated 20-member chit to see how it works.</p>
+  </div>
+
+  <figure class="ring-figure" aria-labelledby="ring-caption">
+    <svg id="ring" viewBox="0 0 440 440" role="img" aria-label="Twenty seats arranged in a circle"></svg>
+    <div class="ring-controls">
+      <button id="ring-play" class="btn-quiet" type="button" aria-pressed="false">Play</button>
+      <label class="slider">
+        <span class="visually-hidden">Month</span>
+        <input id="ring-month" type="range" min="1" max="20" value="1">
+      </label>
+      <output id="ring-month-label" for="ring-month">Month 1 of 20</output>
+    </div>
+    <figcaption id="ring-caption">
+      <p id="ring-story" aria-live="polite"></p>
+      <ul class="ring-key">
+        <li><span class="key-seat waiting"></span>Waiting for the pot</li>
+        <li><span class="key-seat needy"></span>Waiting and needs cash now</li>
+        <li><span class="key-seat winner"></span>Takes this month's pot</li>
+        <li><span class="key-seat won"></span>Already had the pot</li>
+      </ul>
+    </figcaption>
+  </figure>
+</section>
+
+<section class="prose" id="idea">
+  <h2>Why a seat behaves like an option</h2>
+  <p>Every month you hold a seat, you choose: take the pot now, at whatever discount wins the auction, or wait. Waiting keeps the chance to win later and more cheaply, but if a cash emergency arrives while you wait, money now becomes worth much more to you.</p>
+  <p>That trade-off is the same one a holder of an American option faces, so the same tools apply. Starting from the last month and working backwards gives the value of waiting in every situation (dynamic programming). Simulating thousands of futures and learning the value of waiting by regression gives the same answer in a different way (Longstaff–Schwartz). Then everyone bids this way at once, and the bids are iterated until nobody can do better by changing theirs (an equilibrium).</p>
+  <p>Economists, above all Stefan Klonner, have modelled chit auctions before. What is new here is pricing the seat with option methods, measuring how its value responds to each setting, and asking when in a chit's life loans are most expensive.</p>
+</section>
+
+<section class="wide" id="rates">
+  <div class="section-head">
+    <h2>When are chit loans most expensive?</h2>
+    <p>Each winning bid implies an interest rate: the price of having the pot now rather than at the end. Practitioners say these rates peak a quarter to a third of the way through a chit. Change the settings to see when the model agrees.</p>
+  </div>
+
+  <div class="explorer">
+    <form class="controls" id="explore-form" aria-label="Chit settings">
+      <fieldset>
+        <legend>Members</legend>
+        <div class="seg" data-name="members"></div>
+      </fieldset>
+      <fieldset>
+        <legend>How often members need cash</legend>
+        <div class="seg" data-name="p_need"></div>
+      </fieldset>
+      <fieldset>
+        <legend>What an outside loan costs</legend>
+        <div class="seg" data-name="r_borrow"></div>
+      </fieldset>
+      <fieldset>
+        <legend>Largest discount allowed</legend>
+        <div class="seg" data-name="cap"></div>
+      </fieldset>
+    </form>
+
+    <div class="chart-panel">
+      <div class="chart" id="rates-chart"></div>
+      <dl class="readout" id="rates-readout"></dl>
+    </div>
+  </div>
+  <p class="fine">Yield to end: the average rate a winner pays from that month to the end. Forward rate: the price of getting the pot one month earlier. Both are averages over all the ways the chit could unfold, computed exactly rather than simulated.</p>
+</section>
+
+<section class="wide" id="data">
+  <div class="section-head">
+    <h2>Checked against real chits</h2>
+    <p>Two things about members can't be observed: how often they need cash and what outside loans cost them. Both were tuned so the model reproduces bids from a chit company in Tamil Nadu studied by Klonner and Rai: 40 members, 40 months, a ₹10,000 pot.</p>
+  </div>
+
+  <div class="data-grid">
+    <div>
+      <table class="fit">
+        <caption>Before the 1993 bid cap</caption>
+        <thead><tr><th scope="col"></th><th scope="col">Real chits</th><th scope="col">Model</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Average early winning bid</th><td>35.1%</td><td>33.7%</td></tr>
+          <tr><th scope="row">Early bids at 30% or more</th><td>79.1%</td><td>78.8%</td></tr>
+        </tbody>
+      </table>
+      <p class="fit-note">Fitted: members need cash in 4.25% of months; outside loans cost 3.3% a month (about 48% a year).</p>
+
+      <h3>What the model gets right</h3>
+      <ul class="tight">
+        <li>Rates average about 14.5% a year, inside the 14–24% reported for these chits.</li>
+        <li>The yield peaks in month 16 of 40, 40% of the way through: early to mid tenure.</li>
+        <li>A 30% cap lowers early bids, as it did in 1993.</li>
+      </ul>
+      <h3>What it gets wrong</h3>
+      <ul class="tight">
+        <li>After the cap it puts 95% of early bids at the cap; real chits had 72%.</li>
+        <li>It predicts late bids rise after the cap. In reality they fell, just less than early bids.</li>
+      </ul>
+      <p class="fit-note">Real members differ from each other and some default. The model's members are identical and always pay, which is the likely reason for both misses.</p>
+    </div>
+    <div class="chart-panel">
+      <div class="chart" id="cap-chart"></div>
+    </div>
+  </div>
+</section>
+
+<section class="wide" id="advice">
+  <div class="section-head">
+    <h2>Should I bid this month?</h2>
+    <p>Enter your chit and the winning bids so far. The model reads the past bids to judge how many members are likely to need cash now, then works out the most you should give up.</p>
+  </div>
+
+  <div class="advice-grid">
+    <form id="advice-form" class="advice-form">
+      <label class="field">
+        <span>Members in the chit</span>
+        <select name="members">
+          <option>20</option><option>25</option><option>30</option><option selected>40</option>
+        </select>
+      </label>
+      <label class="field">
+        <span>Monthly instalment (₹)</span>
+        <input name="instalment" type="number" min="1" step="1" value="250" inputmode="numeric">
+      </label>
+      <fieldset class="field">
+        <legend>Largest discount allowed</legend>
+        <div class="seg" data-name="advice_cap">
+          <button type="button" data-value="0.3">30%</button>
+          <button type="button" data-value="0.4" aria-pressed="true">40%</button>
+        </div>
+      </fieldset>
+      <label class="field">
+        <span>Winning bids so far, as % of the pot</span>
+        <input name="history" type="text" value="38, 37, 37" placeholder="e.g. 38, 37, 37" autocomplete="off">
+        <small>In order, after the foreman's month. Leave empty before the first auction.</small>
+      </label>
+      <fieldset class="field">
+        <legend>Do you need cash now?</legend>
+        <div class="seg" data-name="in_need">
+          <button type="button" data-value="1" aria-pressed="true">Yes</button>
+          <button type="button" data-value="0">No</button>
+        </div>
+      </fieldset>
+      <label class="field">
+        <span>Your outside borrowing rate, % a month (optional)</span>
+        <input name="my_r" type="number" min="0" max="20" step="0.1" placeholder="3.3" inputmode="decimal">
+      </label>
+      <button class="btn" type="submit" id="advice-go" disabled>Loading the model…</button>
+      <p class="status" id="model-status" aria-live="polite">The model runs in your browser. Loading it takes a few seconds the first time.</p>
+    </form>
+
+    <div class="advice-out" id="advice-out" aria-live="polite">
+      <p class="empty">Your advice will appear here.</p>
+    </div>
+  </div>
+</section>
+
+<section class="prose" id="method">
+  <h2>How it was built</h2>
+  <p>Everything runs on one tested Python package, the same code this page runs in your browser.</p>
+  <ul class="tight">
+    <li><strong>Seat value and best bids.</strong> Backward induction over (month, own need, number of others in need), checked against a brute-force search over all 1,024 strategies in a small chit.</li>
+    <li><strong>Longstaff–Schwartz.</strong> Learns the same values from 50,000 simulated futures; agrees with the dynamic programme within simulation error. A smooth polynomial regression, the textbook choice, loses value here because the best rule jumps when the first rival needs cash.</li>
+    <li><strong>Equilibrium.</strong> Everyone bids up to the price at which winning and waiting are equally good; best responses are iterated until they stop changing. The same answer is reached from three different starting points, and nobody can gain by deviating.</li>
+    <li><strong>Rates.</strong> The number of members in need is a Markov chain, so the rate curves are computed exactly and then confirmed by simulation.</li>
+    <li><strong>Bidding advice.</strong> A hidden-Markov filter reads past winning bids to infer how many members need cash.</li>
+  </ul>
+  <p>Limits worth knowing: members are identical, know how many others need cash, and never default. Calibration uses two published figures from one company, not bid-by-bid records.</p>
+  <p class="byline">Built in 24 hours by Sanjay Ashok. Data from Klonner &amp; Rai and Eeckhout &amp; Munshi. <a href="https://github.com/sanjayashokbuilds/chit-options">Read the code and the full write-up</a>.</p>
+</section>
+
+</main>
+
+<div class="tooltip" id="tooltip" role="status" hidden></div>
+<script src="charts.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

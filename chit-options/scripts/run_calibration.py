@@ -74,7 +74,7 @@ def main():
     }
     (OUT / "calibration.json").write_text(json.dumps(out, indent=2))
 
-    months = np.arange(1, chit.n_members - 1)
+    months = np.arange(2, chit.n_members)               # calendar months of the auctions
     fig, ax = plt.subplots(figsize=(8, 4.5))
     ax.plot(months, 100 * an.annual(ts_before.yield_end[1:-1]), color=BLUE, label="Before 1993 (no binding cap)")
     ax.plot(months, 100 * an.annual(ts_after.yield_end[1:-1]), color=ORANGE, label="After 1993 (30% cap)")

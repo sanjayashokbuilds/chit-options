@@ -103,8 +103,8 @@ class Scenario:
     mean_forward: float        # average forward rate, months 1..N-2, annualised
     mean_yield: float          # average yield to end, months 1..N-2, annualised
     first_discount: float      # expected winning discount in month 1
-    forward_peak: float        # peak month of the forward curve / N
-    yield_peak: float          # peak month of the yield curve / N
+    forward_peak: float        # calendar month of the forward-rate peak / N
+    yield_peak: float          # calendar month of the yield-to-end peak / N
     converged: bool
     deviation_gain: float
 
@@ -117,7 +117,9 @@ def run(chit: ChitParams, members: MemberParams, label="base"):
                   float(np.mean(annual(ts.forward[1:]))),
                   float(np.mean(annual(ts.yield_end[1:-1]))),
                   float(ts.discount[1]),
-                  ts.peak_month("forward") / N, ts.peak_month("yield") / N,
+                  # month index t counts from 0 (the foreman's month), so the
+                  # calendar month is t + 1
+                  (ts.peak_month("forward") + 1) / N, (ts.peak_month("yield") + 1) / N,
                   e.converged, e.deviation_gain)
     return sc, ts, e
 

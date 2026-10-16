@@ -49,7 +49,7 @@ def main():
 
     # 1. Base term structure
     sc, ts, e = an.run(BASE_CHIT, BASE_MEMBERS)
-    months = np.arange(1, BASE_CHIT.n_members - 1)
+    months = np.arange(2, BASE_CHIT.n_members)          # calendar months of the auctions
     results["base"]["scenario"] = scenario_dict(sc)
     results["base"]["term_structure"] = {
         "month": months.tolist(),
