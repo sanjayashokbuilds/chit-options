@@ -21,6 +21,7 @@ Assumptions (flagged in the README):
 """
 
 from dataclasses import dataclass
+from functools import lru_cache
 from math import comb
 
 from .mechanics import ChitParams
@@ -69,6 +70,8 @@ def bid_outcome(chit: ChitParams, book: RivalBook) -> tuple[float, float]:
     return 1.0 / (book.n_top + 1), chit.bid_cap     # lottery with the rivals at the cap
 
 
-def binomial_pmf(trials: int, p: float) -> list[float]:
-    """P(exactly j successes) for j = 0..trials."""
-    return [comb(trials, j) * p**j * (1 - p) ** (trials - j) for j in range(trials + 1)]
+@lru_cache(maxsize=None)
+def binomial_pmf(trials: int, p: float) -> tuple[float, ...]:
+    """P(exactly j successes) for j = 0..trials. Cached: the solvers ask for
+    the same few (trials, p) pairs millions of times."""
+    return tuple(comb(trials, j) * p**j * (1 - p) ** (trials - j) for j in range(trials + 1))

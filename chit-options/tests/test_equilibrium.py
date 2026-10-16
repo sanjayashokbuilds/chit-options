@@ -50,3 +50,13 @@ def test_equilibrium_value_matches_the_simulator():
     paths = simulate_many(CHIT, MEMBERS, eq.TableStrategy(e.w), 8_000, seed=4)
     pv = np.array([member_pv(CHIT, MEMBERS, p, 3) for p in paths])
     assert abs(pv.mean() - e.value) < 4 * pv.std() / np.sqrt(len(pv))
+
+
+def test_no_profitable_deviation_when_the_cap_binds():
+    # Regression test: near-ties at the cap used to be broken by rounding,
+    # which made "deviating" to exactly the cap look profitable.
+    chit = ChitParams(12, 100, 0.05, 0.20)
+    m = MemberParams(r_borrow=0.04, r_save=0.005, p_need=0.20)
+    e = eq.solve(chit, m)
+    assert e.converged and abs(e.deviation_gain) < 1e-8
+    assert np.any(np.isclose(e.w[eq.valid_mask(12)], 0.20))   # the cap really binds

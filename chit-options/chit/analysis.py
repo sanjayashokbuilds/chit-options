@@ -18,6 +18,30 @@ from .mechanics import ChitParams
 from .members import MemberParams
 
 
+def month_law(chit: ChitParams, members: MemberParams, w, t: int):
+    """Month t (N - t members waiting) when everyone follows table w.
+    Returns d[K] = the winning discount when K waiting members are in need, and
+    T[K, K'] = the chance of K' needy among next month's N - t - 1 waiting."""
+    nw, p = chit.n_members - t, members.p_need
+    d = np.zeros(nw + 1)
+    T = np.zeros((nw + 1, max(nw, 1)))
+    for K in range(nw + 1):
+        outcomes = eq.auction(chit, eq._groups(w, t, K, nw - K, K))
+        d[K] = outcomes[0][2]                          # same price whoever wins
+        for q, lab, _ in outcomes:
+            k_after = K - (lab == "needy")
+            if nw > 1:
+                for j, qj in enumerate(binomial_pmf(nw - 1 - k_after, p)):
+                    T[K, k_after + j] += q * qj
+    return d, T
+
+
+def month1_prior(chit: ChitParams, members: MemberParams) -> np.ndarray:
+    """P(K needy among the N - 1 non-foreman members at month 1's auction)."""
+    p = members.p_need
+    return np.array(binomial_pmf(chit.n_members - 1, 1 - (1 - p) ** 2))
+
+
 @dataclass
 class TermStructure:
     discount: np.ndarray    # E[winning discount] by month (month 0 = foreman, 0)
@@ -25,34 +49,35 @@ class TermStructure:
     yield_end: np.ndarray   # E[yield from t to the end], monthly
     p_cap: np.ndarray       # chance the cap binds in month t
     needy_share: np.ndarray # E[share of waiting members in need] at month t's auction
+    laws: list              # laws[t] = (P(K) at month t, d[K]); None for month 0
 
     def peak_month(self, kind: str = "forward") -> int:
         """Month (from 1) where the average forward rate or yield to end is highest."""
         curve = self.forward[1:] if kind == "forward" else self.yield_end[1:-1]
         return int(np.nanargmax(curve) + 1)
 
+    def mean_discount(self, months) -> float:
+        return float(np.mean([self.discount[t] for t in months]))
+
+    def share_at_least(self, threshold: float, months) -> float:
+        """Average over the given months of P(winning discount >= threshold)."""
+        return float(np.mean([self.laws[t][0] @ (self.laws[t][1] >= threshold - 1e-12)
+                              for t in months]))
+
 
 def term_structure(chit: ChitParams, members: MemberParams, w) -> TermStructure:
-    N, p, cap = chit.n_members, members.p_need, chit.bid_cap
+    N, cap = chit.n_members, chit.bid_cap
     discount, p_cap, needy_share = np.zeros(N), np.zeros(N), np.zeros(N)
     yield_end = np.full(N, np.nan)
     forward = np.full(N - 1, np.nan)
+    laws = [None] * N
 
-    # Month 1: the N - 1 non-foreman members, each in need with prob 1-(1-p)^2.
-    dist = np.array(binomial_pmf(N - 1, 1 - (1 - p) ** 2))
+    dist = month1_prior(chit, members)
     prev_d = prev_dist = prev_T = None
     for t in range(1, N):
         nw = N - t
-        d = np.zeros(nw + 1)
-        T = np.zeros((nw + 1, nw))                     # next month: nw - 1 waiting
-        for K in range(nw + 1):
-            outcomes = eq.auction(chit, eq._groups(w, t, K, nw - K, K))
-            d[K] = outcomes[0][2]                      # same price whoever wins
-            for q, lab, _ in outcomes:
-                k_after = K - (lab == "needy")
-                if nw > 1:
-                    for j, qj in enumerate(binomial_pmf(nw - 1 - k_after, p)):
-                        T[K, k_after + j] += q * qj
+        d, T = month_law(chit, members, w, t)
+        laws[t] = (dist, d)
         discount[t] = dist @ d
         p_cap[t] = dist @ (d >= cap - 1e-12)
         needy_share[t] = dist @ (np.arange(nw + 1) / nw)
@@ -64,7 +89,7 @@ def term_structure(chit: ChitParams, members: MemberParams, w) -> TermStructure:
             forward[t - 1] = np.sum(prev_dist[:, None] * prev_T * ratio)
         prev_d, prev_dist, prev_T = d, dist, T
         dist = dist @ T if nw > 1 else None
-    return TermStructure(discount, forward, yield_end, p_cap, needy_share)
+    return TermStructure(discount, forward, yield_end, p_cap, needy_share, laws)
 
 
 def annual(monthly):

@@ -21,7 +21,7 @@
       "forward_peak": 0.65,
       "yield_peak": 0.45,
       "converged": true,
-      "deviation_gain": 0.0
+      "deviation_gain": -0.0
     },
     "term_structure": {
       "month": [
@@ -136,7 +136,7 @@
       "forward_peak": 0.4,
       "yield_peak": 0.2,
       "converged": true,
-      "deviation_gain": 0.0
+      "deviation_gain": -0.0
     },
     {
       "label": "p_need=0.05",
@@ -147,7 +147,7 @@
       "forward_peak": 0.4,
       "yield_peak": 0.25,
       "converged": true,
-      "deviation_gain": 0.0
+      "deviation_gain": -0.0
     },
     {
       "label": "p_need=0.1",
@@ -158,7 +158,7 @@
       "forward_peak": 0.65,
       "yield_peak": 0.45,
       "converged": true,
-      "deviation_gain": 0.0
+      "deviation_gain": -0.0
     },
     {
       "label": "p_need=0.2",
@@ -169,7 +169,7 @@
       "forward_peak": 0.85,
       "yield_peak": 0.8,
       "converged": true,
-      "deviation_gain": 0.0
+      "deviation_gain": -0.0
     },
     {
       "label": "p_need=0.4",
@@ -194,7 +194,7 @@
         "forward_peak": 0.65,
         "yield_peak": 0.45,
         "converged": true,
-        "deviation_gain": 0.0
+        "deviation_gain": -0.0
       },
       {
         "label": "r_borrow=0.02",
@@ -205,7 +205,7 @@
         "forward_peak": 0.65,
         "yield_peak": 0.45,
         "converged": true,
-        "deviation_gain": 0.0
+        "deviation_gain": -0.0
       },
       {
         "label": "r_borrow=0.03",
@@ -216,7 +216,7 @@
         "forward_peak": 0.65,
         "yield_peak": 0.45,
         "converged": true,
-        "deviation_gain": 0.0
+        "deviation_gain": -0.0
       },
       {
         "label": "r_borrow=0.04",
@@ -227,7 +227,7 @@
         "forward_peak": 0.65,
         "yield_peak": 0.45,
         "converged": true,
-        "deviation_gain": 0.0
+        "deviation_gain": -0.0
       }
     ],
     "r_save": [
@@ -240,7 +240,7 @@
         "forward_peak": 0.65,
         "yield_peak": 0.45,
         "converged": true,
-        "deviation_gain": 0.0
+        "deviation_gain": -0.0
       },
       {
         "label": "r_save=0.005",
@@ -251,7 +251,7 @@
         "forward_peak": 0.65,
         "yield_peak": 0.45,
         "converged": true,
-        "deviation_gain": 0.0
+        "deviation_gain": -0.0
       },
       {
         "label": "r_save=0.01",
@@ -262,7 +262,7 @@
         "forward_peak": 0.65,
         "yield_peak": 0.45,
         "converged": true,
-        "deviation_gain": 0.0
+        "deviation_gain": -0.0
       }
     ],
     "commission": [
@@ -275,7 +275,7 @@
         "forward_peak": 0.65,
         "yield_peak": 0.45,
         "converged": true,
-        "deviation_gain": 0.0
+        "deviation_gain": -0.0
       },
       {
         "label": "commission=0.05",
@@ -286,7 +286,7 @@
         "forward_peak": 0.65,
         "yield_peak": 0.45,
         "converged": true,
-        "deviation_gain": 0.0
+        "deviation_gain": -0.0
       },
       {
         "label": "commission=0.07",
@@ -297,7 +297,7 @@
         "forward_peak": 0.65,
         "yield_peak": 0.45,
         "converged": true,
-        "deviation_gain": 0.0
+        "deviation_gain": -0.0
       }
     ]
   },
@@ -323,7 +323,7 @@
         "forward_peak": 0.85,
         "yield_peak": 0.8,
         "converged": true,
-        "deviation_gain": 0.0
+        "deviation_gain": -0.0
       },
       {
         "label": "cap=0.35",
@@ -334,29 +334,29 @@
         "forward_peak": 0.85,
         "yield_peak": 0.8,
         "converged": true,
-        "deviation_gain": 0.0
+        "deviation_gain": -0.0
       },
       {
         "label": "cap=0.3",
-        "seat_value": -0.10759,
-        "mean_forward": 0.24074,
-        "mean_yield": 0.375265,
+        "seat_value": -0.108815,
+        "mean_forward": 0.240971,
+        "mean_yield": 0.378018,
         "first_discount": 0.3,
         "forward_peak": 0.85,
         "yield_peak": 0.8,
         "converged": true,
-        "deviation_gain": 0.001161
+        "deviation_gain": -0.0
       },
       {
         "label": "cap=0.25",
-        "seat_value": -0.107253,
-        "mean_forward": 0.188994,
-        "mean_yield": 0.337951,
+        "seat_value": -0.110505,
+        "mean_forward": 0.18964,
+        "mean_yield": 0.345119,
         "first_discount": 0.25,
         "forward_peak": 0.85,
         "yield_peak": 0.8,
         "converged": true,
-        "deviation_gain": 0.008014
+        "deviation_gain": -0.0
       }
     ],
     "p_cap_month1": [

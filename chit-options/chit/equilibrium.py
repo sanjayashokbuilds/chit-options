@@ -31,6 +31,9 @@ from .mechanics import ChitParams
 from .members import MemberParams, myopic_reservation
 
 
+TIE = 1e-9   # willingness within this of each other counts as a tie
+
+
 def auction(chit: ChitParams, groups):
     """groups: [(label, willingness, how many bidders)]. Highest willingness wins
     (lottery among ties); price = second-highest willingness among all bidders,
@@ -39,14 +42,14 @@ def auction(chit: ChitParams, groups):
     live = [(lab, w, n) for lab, w, n in groups if n > 0]
     total = sum(n for _, _, n in live)
     top = max(w for _, w, _ in live)
-    at_top = [(lab, n) for lab, w, n in live if w == top]
+    at_top = [(lab, n) for lab, w, n in live if w >= top - TIE]
     m = sum(n for _, n in at_top)
     if total == 1:
         price = chit.commission
     elif m >= 2:
         price = top
     else:
-        price = max(w for _, w, _ in live if w < top)
+        price = max(w for _, w, _ in live if w < top - TIE)
     return [(n / m, lab, price) for lab, n in at_top]
 
 
@@ -180,6 +183,10 @@ def solve(chit: ChitParams, members: MemberParams, start=None, damping=0.5,
         change = float(np.max(np.abs(br[mask] - w[mask])))
         changes.append(change)
         w[mask] = w[mask] + damping * (br[mask] - w[mask])
+        # Damping only approaches the cap or the floor asymptotically; snap values
+        # that are effectively there, so ties at the cap are recognised as ties.
+        for edge in (chit.bid_cap, chit.commission):
+            w[mask & (np.abs(w - edge) < 1e-7)] = edge
         if change < tol:
             converged = True
             break
