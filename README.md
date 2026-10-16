@@ -2,13 +2,13 @@
 
 [![tests](https://github.com/sanjayashokbuilds/chit-options/actions/workflows/tests.yml/badge.svg)](https://github.com/sanjayashokbuilds/chit-options/actions/workflows/tests.yml)
 
-**Live app:** link to be added once deployed (see [Bidding calculator and web app](#bidding-calculator-and-web-app)).
+**Live app: [chit-options.netlify.app](https://chit-options.netlify.app/)**. Play a chit against bidders who follow the model, explore when chit loans are most expensive, and get bidding advice for a real chit.
 
 A seat in a Tamil chit fund is a one-time right to take the pot in any month, at a price set by auction. That makes it an American option. This project prices it with the standard tools for American options (backward-induction dynamic programming and Longstaff–Schwartz least-squares Monte Carlo), solves for equilibrium bidding when every member does the same, and asks a question practitioners raise but the literature hasn't modelled: **why do implied interest rates in chits peak early-to-mid tenure?**
 
 The model is calibrated to published bid data from a Tamil Nadu chit company. It reproduces the level of chit interest rates and an early-to-mid hump in the implied-rate curve, and it gets the effect of the 1993 bid cap only half right. Both the successes and the failures are reported below.
 
-Built as a 24-hour solo project. Everything is one tested Python package (45 tests); the web app runs the same package in the browser.
+Built as a 24-hour solo project by Sanjay Ashok. Everything is one tested Python package (45 tests); the web app runs the same package in the browser.
 
 ---
 
@@ -22,7 +22,7 @@ Built as a 24-hour solo project. Everything is one tested Python package (45 tes
 6. [Validation](#validation)
 7. [Results](#results)
 8. [Calibration to real chits](#calibration-to-real-chits)
-9. [Bidding calculator and web app](#bidding-calculator-and-web-app)
+9. [The web app and bidding calculator](#the-web-app-and-bidding-calculator)
 10. [Limitations and next steps](#limitations-and-next-steps)
 11. [Repository and reproduction](#repository-and-reproduction)
 12. [References](#references)
@@ -167,7 +167,17 @@ Data: the chit company in Tamil Nadu studied by Klonner and Rai; its most common
 
 So the model reproduces the level of rates and the early-to-mid hump, but its account of the cap is only half right.
 
-## Bidding calculator and web app
+## The web app and bidding calculator
+
+**[chit-options.netlify.app](https://chit-options.netlify.app/)** is a static site (`docs/`) with four parts.
+
+**Play a chit.** You take a seat in a 10-member chit (₹1,000 a month) against nine rivals who bid the model's equilibrium. Each month the bidding climbs live and you choose when to drop out; cash emergencies arrive at random, and while you need cash without the pot it costs you the outside borrowing rate. An optional coach shows the model's limit for your situation. At the end, the same chit, with the same emergencies and the same lottery draws, is replayed with the model's rule in your seat, so the comparison is fair: you see whether you beat the model and by how much, in today's money, along with your month-by-month cash.
+
+**When are chit loans most expensive?** Pick the number of members, how often needs arrive, the cost of outside loans and the bid cap, and see the exact implied-rate curves for that setting (144 precomputed equilibria), with the practitioner range marked.
+
+**Checked against real chits.** The calibration, the before-and-after-cap curves, and what the model gets right and wrong.
+
+**Should I bid this month?** The calculator for a real chit: enter its size, instalment, cap and the winning bids so far, and whether you need cash. It infers how many members probably need cash from past bids and returns your limit, your chance of winning and the likely price. It runs this repository's Python in the browser with [Pyodide](https://pyodide.org). The same calculator works from the command line:
 
 ```bash
 python scripts/advise.py --members 40 --instalment 250 --history 0.38,0.37,0.37 --in-need
@@ -175,9 +185,9 @@ python scripts/advise.py --members 40 --instalment 250 --history 0.38,0.37,0.37 
 # about 42%, at an expected discount of 36.4%.
 ```
 
-The **web app** (`docs/`, a static site) lets you **play a chit**: you sit in a 10-member chit against nine rivals who bid the model's equilibrium, cash emergencies arrive at random, and you drop out of or stay in each rising auction. At the end the same chit (same emergencies, same lottery draws) is replayed with the model's rule in your seat, so you can see whether you beat it. The game's chit engine is written in JavaScript and a test checks its average winning bids against the Python model's exact numbers. The app also plays through one simulated chit seat by seat, lets you explore the implied-rate curve across 144 precomputed settings, shows the calibration, and runs the calculator. The calculator executes this repository's Python in the browser with [Pyodide](https://pyodide.org); the equilibrium tables it needs are precomputed by `scripts/build_site.py`, because solving them live in a browser is too slow.
+**How the site is built.** Solving equilibria in a browser is too slow, so `scripts/build_site.py` precomputes the bidding tables and rate curves as JSON and copies the package into `docs/py/` for Pyodide. The game's chit engine is written in JavaScript for speed; a test (`tests/test_web.py`, using `tests/game_engine_check.js`) runs it 6,000 times and checks its average winning bid in every month against the Python model's exact numbers. Chart colours are checked for colour-blind separation and contrast, and the layout works on phones and in dark mode.
 
-To publish it on **Netlify**: import this repository, leave the build command empty and set the publish directory to `docs` (the included `netlify.toml` does this for you). On **GitHub Pages**: Settings → Pages → Deploy from a branch → `main`, folder `/docs`.
+**Deploying.** On Netlify, import the repository; `netlify.toml` publishes `docs/` with no build step. On GitHub Pages: Settings → Pages → Deploy from a branch → `main`, folder `/docs`.
 
 ## Limitations and next steps
 
@@ -205,8 +215,10 @@ chit/              the package (numpy only)
   web.py           JSON entry point for the browser
 scripts/           results, calibration, site build, command-line advice
 results/           figures and JSON outputs
-docs/              the web app (static; netlify.toml publishes it)
-tests/             45 tests
+docs/              the web app: index.html, style.css, app.js, charts.js,
+                   game.js (the chit game), data/ (precomputed JSON), py/ (package copy)
+tests/             45 tests, plus game_engine_check.js for the browser game
+netlify.toml       publishes docs/ on Netlify
 ```
 
 ```bash
